@@ -21,6 +21,12 @@ if [ -z "$IMG_PATH" ]; then
   IMG_PATH=$PWD
 fi
 
+# stop script if directory doesn't exist
+if [ ! -d "$IMG_PATH" ]; then
+  echo "Directory [$IMG_PATH] doesn't exist"
+  exit
+fi
+
 # set current path
 CURR_DIR=$(basename "$IMG_PATH")
 
@@ -31,6 +37,8 @@ mkdir "$OUTPUT_PATH"
 
 #
 # Compress all jpeg images in directory. Copy videos if exist
+# param1 - path to compress
+# param2 - output path
 #
 function compressFolder {
   echo "Starting to compress $1 folder... "
@@ -50,13 +58,27 @@ function compressFolder {
 
       # copy videos if exist
       "MOV")
-        cp "$file" "$OUTPUT_PATH"
-        echo "$filename [copied to] $OUTPUT_PATH"
+        cp "$file" "$2"
+        echo "$filename [copied to] $2"
         ;;
 
     esac
   done
 }
+
+#
+# Compress child folder
+#
+# function recurse {
+#  for i in "$1"/*; do
+#     if [ -d "$i" ]; then
+#         echo "dir: $i"
+#         recurse "$i"
+#     elif [ -f "$i" ]; then
+#         echo "file: $i"
+#     fi
+#  done
+# }
 
 # start compression
 compressFolder "$IMG_PATH" "$OUTPUT_PATH"
