@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# compress all *.jpg files
+# and place them in the new directory with postfix '-compressed'
+# with the same modification date as original files.
+
 # case insensitive
 shopt -s nocaseglob
 
@@ -53,7 +57,7 @@ function compressFolder {
 
       # compress .jpg, ^^ = to upper case
       "JPG" | "JPEG")
-        jpegoptim -o -m75 -d "$2" "$file"
+        jpegoptim -o -m75 -d "$2" -p "$file"
         ;;
 
       # copy videos if exist
