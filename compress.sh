@@ -1,88 +1,64 @@
 #!/bin/bash
 
 # compress all *.jpg files
-# and place them in the new directory with postfix '-compressed'
-# with the same modification date as original files.
+# copy original files into the new directory with postfix '-original'
 
 # case insensitive
-shopt -s nocaseglob
+# shopt -s nocaseglob
 
-IMG_PATH=""
+INPUT_PATH=""
 OUTPUT_PATH=""
+PREFIX="[original]"
 
 # set flags
 while getopts "d:" OPTION
 do
   case $OPTION in
     d)
-      IMG_PATH="$OPTARG" ;;
+      INPUT_PATH="$OPTARG" ;;
     \?)
       echo "Used for the help menu" exit ;;
   esac
 done
 
-if [ -z "$IMG_PATH" ]; then
-  IMG_PATH=$PWD
+if [ -z "$INPUT_PATH" ]; then
+  INPUT_PATH=$PWD
 fi
 
-# stop script if directory doesn't exist
-if [ ! -d "$IMG_PATH" ]; then
-  echo "Directory [$IMG_PATH] doesn't exist"
-  exit
-fi
+cd "$INPUT_PATH"
+OUTPUT_PATH="$PWD $PREFIX"
 
-# set current path
-CURR_DIR=$(basename "$IMG_PATH")
-
-# create output folder
-cd "$IMG_PATH"
-OUTPUT_PATH="$PWD [compressed]"
-mkdir "$OUTPUT_PATH"
+# create a backup
+echo "Copying [$INPUT_PATH]"
+rsync -a --info=progress2 "$INPUT_PATH/" "$OUTPUT_PATH"
 
 #
-# Compress all jpeg images in directory. Copy videos if exist
-# param1 - path to compress
-# param2 - output path
+# Compress all jpeg images in directory
+# param1 - path to img that need to be compressed
 #
-function compressFolder {
-  echo "Starting to compress $1 folder... "
-  echo "------"
+function compressFolder() {
+  in_path="$1"
+  echo "Starting compressing $in_path folder... "
 
-  for file in "$1"/*
-  do
-    filename=$(basename "$file")
-    extension="${filename##*.}"
+  for file in "$in_path"/*; do
+    if [ -d "$file" ]; then
+        echo ""
+        echo "checking parent directory"
+        echo "$file"
+        echo ""
+        compressFolder "$file"
+    elif [ -f "$file" ]; then
+        filename=$(basename "$file")
+        extension="${filename##*.}"
 
-    case "${extension^^}" in
-
-      # compress .jpg, ^^ = to upper case
-      "JPG" | "JPEG")
-        jpegoptim -o -m75 -d "$2" -p "$file"
-        ;;
-
-      # copy videos if exist
-      "MOV")
-        cp "$file" "$2"
-        echo "$filename [copied to] $2"
-        ;;
-
-    esac
+        case "${extension^^}" in
+          "JPG" | "JPEG")
+            jpegoptim -o -m75 -p "$file"
+            ;;
+        esac
+    fi
   done
 }
 
-#
-# Compress child folder
-#
-# function recurse {
-#  for i in "$1"/*; do
-#     if [ -d "$i" ]; then
-#         echo "dir: $i"
-#         recurse "$i"
-#     elif [ -f "$i" ]; then
-#         echo "file: $i"
-#     fi
-#  done
-# }
-
-# start compression
-compressFolder "$IMG_PATH" "$OUTPUT_PATH"
+# run compressing
+compressFolder "$INPUT_PATH"
