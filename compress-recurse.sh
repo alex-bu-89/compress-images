@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # compress all *.jpg files
-# and place them in the new directory with postfix '-compressed'
-# with the same modification date as original files.
+# copy original files into the new directory with postfix '-original'
 
 # case insensitive
 # shopt -s nocaseglob
+
+INPUT_PATH=""
+OUTPUT_PATH=""
+PREFIX="[original]"
 
 # set flags
 while getopts "d:" OPTION
@@ -22,29 +25,40 @@ if [ -z "$INPUT_PATH" ]; then
   INPUT_PATH=$PWD
 fi
 
-#
-# Compress child folder
-#
-function recurse {
-  input_path="$1"
-  output_path=""
+cd "$INPUT_PATH"
+OUTPUT_PATH="$PWD $PREFIX"
 
-  # create output folder
-  cd "$input_path"
-  output_path="$PWD [compressed]"
-  mkdir "$output_path"
+# create a backup
+echo "Copying [$INPUT_PATH]"
+rsync -a --info=progress2 "$INPUT_PATH/" "$OUTPUT_PATH"
 
-  for file in "$input_path"/*; do
+#
+# Compress all jpeg images in directory
+# param1 - path to img that need to be compressed
+#
+function compressFolder() {
+  in_path="$1"
+  echo "Starting compressing $in_path folder... "
+
+  for file in "$in_path"/*; do
     if [ -d "$file" ]; then
         echo ""
-        echo "----------- checking parent directory"
+        echo "checking parent directory"
         echo "$file"
         echo ""
-        recurse "$file"
+        compressFolder "$file"
     elif [ -f "$file" ]; then
-        echo "file: $file"
+        filename=$(basename "$file")
+        extension="${filename##*.}"
+
+        case "${extension^^}" in
+          "JPG" | "JPEG")
+            jpegoptim -o -m75 -p "$file"
+            ;;
+        esac
     fi
   done
 }
 
-recurse "$INPUT_PATH"
+# run compressing
+compressFolder "$INPUT_PATH"
