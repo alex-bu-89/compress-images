@@ -36,7 +36,7 @@ rsync -a --info=progress2 "$INPUT_PATH/" "$OUTPUT_PATH"
 # Compress all jpeg images in directory
 # param1 - path to img that need to be compressed
 #
-function compressFolder() {
+function compressFolders() {
   in_path="$1"
   echo "Starting compressing $in_path folder... "
 
@@ -46,7 +46,7 @@ function compressFolder() {
         echo "checking parent directory"
         echo "$file"
         echo ""
-        compressFolder "$file"
+        compressFolders "$file"
     elif [ -f "$file" ]; then
         filename=$(basename "$file")
         extension="${filename##*.}"
@@ -61,4 +61,4 @@ function compressFolder() {
 }
 
 # run compressing
-compressFolder "$INPUT_PATH"
+compressFolders "$INPUT_PATH"
