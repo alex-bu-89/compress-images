@@ -1,8 +1,12 @@
 # Compress images in folder 
-Script for compressing images using ```jpegoptim```
+Script for compressing jpeg images recursively using ```jpegoptim```
 
-Install on Ubuntu
+Install jpegoptim on Ubuntu
 
+```sudo apt-get install jpegoptim```
+
+### How to use
 ```
-sudo apt-get install jpegoptim
+bash compress.sh -d /path/to/folder/with/images
 ```
+
