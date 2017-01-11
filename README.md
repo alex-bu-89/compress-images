@@ -2,4 +2,7 @@
 Script for compressing images using ```jpegoptim```
 
 Install on Ubuntu
-```sudo apt-get install jpegoptim```
+
+```bash
+sudo apt-get install jpegoptim
+```
