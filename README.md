@@ -8,4 +8,3 @@ Install jpegoptim on Ubuntu:
 ```
 bash compress.sh -d /path/to/folder/with/images
 ```
-
