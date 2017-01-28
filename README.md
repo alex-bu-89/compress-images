@@ -1,5 +1,5 @@
 # Compress images in folder 
-Script for compressing folders with jpeg images recursively using ```jpegoptim```. It will create a copy of original folder with postfix '-original'
+Script for compressing jpegs in the folder recursively using ```jpegoptim```. It will create a copy of original folder with postfix '-original'
 
 Install jpegoptim on Ubuntu: 
 ```sudo apt-get install jpegoptim```
