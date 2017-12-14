@@ -46,7 +46,7 @@ function recursiveCompressImgs() {
         echo "checking parent directory"
         echo "$file"
         echo ""
-        compressFolders "$file"
+        recursiveCompressImgs "$file"
     elif [ -f "$file" ]; then
         filename=$(basename "$file")
         extension="${filename##*.}"
